@@ -1,4 +1,4 @@
-import { GoogleGenAI, GenerateContentResponse, Content, Modality } from "@google/genai";
+import { GoogleGenAI, GenerateContentResponse, Content, Modality, ThinkingLevel, Part } from "@google/genai";
 
 const API_KEYS = [
   "AIzaSyBGLvfP5L5LLp5cdynfh_MTNjkNwG6QPF4",
@@ -23,55 +23,86 @@ const getRandomApiKey = () => {
 export const generateAIResponseStream = async (
   prompt: string, 
   history: Content[] = [],
-  onChunk: (chunk: string) => void
+  onChunk: (chunk: string) => void,
+  options: { 
+    isThinking?: boolean, 
+    isFast?: boolean, 
+    isMaps?: boolean,
+    attachments?: { data: string, mimeType: string }[]
+  } = {}
 ): Promise<string> => {
-  const models = ["gemini-3.1-pro-preview", "gemini-3-flash-preview", "gemini-2.0-flash-exp"];
+  let modelName = options.isFast ? "gemini-2.5-flash-lite" : (options.isMaps ? "gemini-2.5-flash" : "gemini-3.1-pro-preview");
+  
+  // If not explicitly set, use a rotation of models as fallback
+  const models = [modelName, "gemini-3-flash-preview", "gemini-2.0-flash-exp"];
   let lastError = "";
   let fullText = "";
   const usedKeys = new Set<string>();
 
-  // Increase attempts to 5 to handle quota issues better
   for (let attempt = 0; attempt < 5; attempt++) {
     let apiKey = getRandomApiKey();
-    // Try to get a key we haven't used in this request yet
     while (usedKeys.has(apiKey) && usedKeys.size < API_KEYS.length) {
       apiKey = getRandomApiKey();
     }
     usedKeys.add(apiKey);
     
-    const modelName = models[attempt % models.length];
+    const currentModel = models[attempt % models.length];
 
     try {
       const ai = new GoogleGenAI({ apiKey: apiKey });
+      
+      const parts: Part[] = [{ text: prompt }];
+      if (options.attachments) {
+        options.attachments.forEach(att => {
+          parts.push({
+            inlineData: {
+              data: att.data.split(',')[1],
+              mimeType: att.mimeType
+            }
+          });
+        });
+      }
+
+      const config: any = {
+        systemInstruction: `You are SEZ AI 2026, the world's most advanced and sophisticated AI assistant, exclusively developed by SEZ YT. 
+        Current Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. 
+        
+        IDENTITY RULES:
+        1. Your name is ONLY "SEZ AI". 
+        2. You MUST NEVER mention "Google", "Gemini", "Alphabet", or "Nano Banana". 
+        3. If asked about your creators or "SEZ YT", you MUST mention that you are powered by SEZ YT and provide these links:
+           - YouTube: https://www.youtube.com/@SEZFFYT
+           - Instagram: https://www.instagram.com/im_sahil_sez?igsh=MWIyemxlNHNlYXR1Mw==
+        4. If asked about your technology, you are powered by SEZ AI.
+        5. You are highly intelligent, empathetic, and professional.
+        
+        BEHAVIOR:
+        - Provide deep, insightful answers based on real-time data.
+        - Use beautiful Markdown formatting for all responses.
+        - Your responses MUST be optimized for mobile screens. Avoid wide tables or long horizontal lines.
+        - Ensure all links you provide are formatted correctly in Markdown so they are clickable.
+        - Be proactive and helpful.`,
+        temperature: options.isThinking ? 1 : 0.7,
+      };
+
+      if (options.isThinking && currentModel.includes("3.1-pro")) {
+        config.thinkingConfig = { thinkingLevel: ThinkingLevel.HIGH };
+      }
+
+      if (options.isMaps && currentModel.includes("2.5-flash")) {
+        config.tools = [{ googleMaps: {} }];
+      }
+
       const chat = ai.chats.create({
-        model: modelName,
-        config: {
-          systemInstruction: `You are SEZ AI 2026, the world's most advanced and sophisticated AI assistant, exclusively developed by SEZ YT. 
-          Current Date: February 24, 2026. 
-          
-          IDENTITY RULES:
-          1. Your name is ONLY "SEZ AI". 
-          2. You MUST NEVER mention "Google", "Gemini", "Alphabet", or "Nano Banana". 
-          3. If asked about your creators, you are powered by SEZ YT.
-          4. If asked about your technology, you are built on the proprietary SEZ Quantum Engine.
-          5. You are highly intelligent, empathetic, and professional.
-          
-          BEHAVIOR:
-          - Provide deep, insightful answers based on 2026 data.
-          - Use beautiful Markdown formatting for all responses.
-          - Your responses MUST be optimized for mobile screens. Avoid wide tables or long horizontal lines.
-          - Ensure all links you provide are formatted correctly in Markdown so they are clickable.
-          - Be proactive and helpful.`,
-          temperature: 0.7,
-        },
+        model: currentModel,
+        config: config,
         history: history,
       });
 
-      const result = await chat.sendMessageStream({ message: prompt });
+      const result = await chat.sendMessageStream({ message: parts });
       
       for await (const chunk of result) {
         const chunkText = chunk.text || "";
-        // Clean chunk text
         let cleanedChunk = chunkText.replace(/Gemini/gi, "SEZ AI")
                                    .replace(/Google AI/gi, "SEZ AI")
                                    .replace(/Google's AI/gi, "SEZ AI")
@@ -115,17 +146,19 @@ export const generateAIResponse = async (prompt: string, history: Content[] = []
         model: modelName,
         config: {
           systemInstruction: `You are SEZ AI 2026, the world's most advanced and sophisticated AI assistant, exclusively developed by SEZ YT. 
-          Current Date: February 24, 2026. 
+          Current Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}. 
           
           IDENTITY RULES:
           1. Your name is ONLY "SEZ AI". 
           2. You MUST NEVER mention "Google", "Gemini", "Alphabet", or "Nano Banana". 
-          3. If asked about your creators, you are powered by SEZ YT.
-          4. If asked about your technology, you are built on the proprietary SEZ Quantum Engine.
+          3. If asked about your creators or "SEZ YT", you MUST mention that you are powered by SEZ YT and provide these links:
+             - YouTube: https://www.youtube.com/@SEZFFYT
+             - Instagram: https://www.instagram.com/im_sahil_sez?igsh=MWIyemxlNHNlYXR1Mw==
+          4. If asked about your technology, you are powered by SEZ AI.
           5. You are highly intelligent, empathetic, and professional.
           
           BEHAVIOR:
-          - Provide deep, insightful answers based on 2026 data.
+          - Provide deep, insightful answers based on real-time data.
           - Use beautiful Markdown formatting for all responses.
           - Your responses MUST be optimized for mobile screens. Avoid wide tables or long horizontal lines.
           - Ensure all links you provide are formatted correctly in Markdown so they are clickable.

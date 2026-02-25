@@ -1,0 +1,8 @@
+run = "npm run dev"
+entrypoint = "server.ts"
+
+[nix]
+channel = "stable-23_11"
+
+[env]
+NODE_ENV = "development"

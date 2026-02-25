@@ -19,8 +19,8 @@ export default function App() {
   }, [view]);
 
   return (
-    <div className="h-screen w-screen bg-gray-100 flex items-center justify-center overflow-hidden font-sans">
-      <div className="w-full h-full max-w-md bg-white shadow-2xl relative overflow-hidden">
+    <div className="h-screen w-screen bg-zinc-50 flex items-center justify-center overflow-hidden font-sans transition-colors duration-500">
+      <div className="w-full h-full max-w-2xl bg-white shadow-[0_0_100px_rgba(0,0,0,0.05)] relative overflow-hidden md:border-x border-zinc-100">
         {view === 'splash' && <Splash />}
         {view === 'chat' && <Chat onNavigate={setView} />}
         {view === 'encrypt' && <Encryption onBack={() => setView('chat')} />}

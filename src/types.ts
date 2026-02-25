@@ -3,9 +3,18 @@ export interface Message {
   text: string;
   isAI: boolean;
   timestamp: string;
+  attachments?: { data: string, mimeType: string }[];
+  feedback?: 'positive' | 'negative';
 }
 
-export type AppView = 'splash' | 'chat' | 'encrypt' | 'image-gen' | 'about';
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  timestamp: string;
+}
+
+export type AppView = 'splash' | 'chat' | 'encrypt' | 'image-gen' | 'about' | 'history';
 
 export interface CryptoPrice {
   name: string;
