@@ -1,0 +1,5 @@
+{
+  "name": "SEZ AI 2026",
+  "description": "Advanced AI assistant with built-in tools for encryption, image generation, and real-time data.",
+  "requestFramePermissions": ["microphone"]
+}

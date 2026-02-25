@@ -1,0 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+body {
+  @apply antialiased text-gray-900 bg-gray-100;
+}
+
+/* Custom scrollbar for chat */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d1d5db;
+}
+
+/* Markdown styling */
+.markdown-body {
+  @apply text-[15px] leading-relaxed;
+}
+
+.markdown-body p {
+  @apply mb-3 last:mb-0;
+}
+
+.markdown-body ul, .markdown-body ol {
+  @apply mb-3 ml-4 list-outside;
+}
+
+.markdown-body ul {
+  @apply list-disc;
+}
+
+.markdown-body ol {
+  @apply list-decimal;
+}
+
+.markdown-body li {
+  @apply mb-1;
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3 {
+  @apply font-bold mt-4 mb-2;
+}
+
+.markdown-body h1 { @apply text-xl; }
+.markdown-body h2 { @apply text-lg; }
+.markdown-body h3 { @apply text-base; }
+
+.markdown-body code {
+  @apply bg-gray-100 px-1.5 py-0.5 rounded font-mono text-[13px] text-[#6200EE];
+}
+
+.markdown-body pre {
+  @apply bg-gray-800 text-gray-100 p-3 rounded-xl my-3 overflow-x-auto font-mono text-[13px];
+}
+
+.markdown-body pre code {
+  @apply bg-transparent p-0 text-inherit;
+}
+
+.markdown-body blockquote {
+  @apply border-l-4 border-gray-200 pl-4 italic text-gray-500 my-3;
+}
+
+.markdown-body strong {
+  @apply font-bold text-gray-900;
+}
+
+.markdown-body a {
+  @apply text-[#6200EE] underline font-medium hover:text-[#7C4DFF] transition-colors break-all;
+}
+
+/* Ensure images and long text don't break mobile layout */
+.markdown-body img {
+  @apply max-w-full h-auto rounded-lg my-2;
+}
+
+.markdown-body * {
+  @apply max-w-full break-words;
+}
