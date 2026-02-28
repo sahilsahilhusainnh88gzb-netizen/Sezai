@@ -1,19 +1,4 @@
-import { GoogleGenAI, GenerateContentResponse, Content, Modality, ThinkingLevel, Part } from "@google/genai";
 
-const API_KEYS = [
-  "AIzaSyBGLvfP5L5LLp5cdynfh_MTNjkNwG6QPF4",
-  "AIzaSyC2TFyW309Q50qbzdNjMbfuQ4IlFo-lw6Y",
-  "AIzaSyDynyRWTkuumNPe9T21pCscwJy3ZNm6B84",
-  "AIzaSyDvCP7bgn1_uX5lRPNVAph1dVNefcE9apQ",
-  "AIzaSyB6WKs82pXBVMSOr2wiae9zCpL136Mml0s",
-  "AIzaSyB7jQ28jIzb2i6NZvYACMSL5gP1C2Q_-Mk",
-  "AIzaSyDnD4LwG9b3Ti7GIJicAo1JTbO0uNNagS8",
-  "AIzaSyBFfO6Krybsk7xUJsSkZkMDniUmpMb6Tsw",
-  "AIzaSyBUT2Sl0h09SiIR3SZxe8Q9XRfkXhcuuK8",
-  "AIzaSyDu5zMEgQvF2QkroDw_CQ4U5ltSBV5tbW0",
-  "AIzaSyA_bWOfprkabkTidMje-j0eb_8y7HpSG5I",
-  "AIzaSyAGMEm_kkxDxCIqv6tkYZDV02IUhl5jjgY",
-  "AIzaSyCq1Gh0pFQxtgHGxxJTZFFryHBd8AFThRY"
 ];
 
 const getRandomApiKey = () => {
